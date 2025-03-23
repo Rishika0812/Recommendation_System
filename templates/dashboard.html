@@ -1,0 +1,200 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <!-- Welcome Section -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h2>Welcome, {{ user.name }}!</h2>
+                <p class="text-muted">Here's your personalized investment dashboard</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Overview -->
+    <div class="col-md-8 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Market Overview</h4>
+                <div class="row">
+                    {% for index, data in market_data.items() %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ index }}</h5>
+                                <p class="card-text mb-1">Current: ₹{{ "%.2f"|format(data.current_price) }}</p>
+                                <p class="card-text mb-1">
+                                    Change: 
+                                    <span class="{% if data.change >= 0 %}text-success{% else %}text-danger{% endif %}">
+                                        {{ "%.2f"|format(data.change) }} ({{ "%.2f"|format(data.change_percent) }}%)
+                                    </span>
+                                </p>
+                                <p class="card-text">Volume: {{ "{:,}".format(data.volume) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Summary -->
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Portfolio Summary</h4>
+                <div class="mb-3">
+                    <h6>Risk Profile</h6>
+                    <div class="progress mb-2">
+                        <div class="progress-bar" role="progressbar" 
+                             style="width: {{ portfolio.risk_metrics.risk_score * 100 }}%"
+                             aria-valuenow="{{ portfolio.risk_metrics.risk_score * 100 }}" 
+                             aria-valuemin="0" aria-valuemax="100">
+                            {{ "%.1f"|format(portfolio.risk_metrics.risk_score * 100) }}%
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ user.risk_tolerance }} Risk Tolerance</small>
+                </div>
+                <div class="mb-3">
+                    <h6>Monthly Investment</h6>
+                    <p class="h4">₹{{ "{:,}".format(portfolio.monthly_investment) }}</p>
+                </div>
+                <div class="mb-3">
+                    <h6>Investment Horizon</h6>
+                    <p>{{ user.investment_horizon }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portfolio Allocation -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Portfolio Allocation</h4>
+                <canvas id="allocationChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Investment Recommendations -->
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Investment Recommendations</h4>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Allocation</th>
+                                <th>Recommended Stocks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for category, allocation in portfolio.allocation.items() %}
+                            <tr>
+                                <td>{{ category }}</td>
+                                <td>{{ "%.1f"|format(allocation * 100) }}%</td>
+                                <td>
+                                    {% for stock in portfolio.recommendations[category] %}
+                                    <span class="badge bg-primary me-1">{{ stock }}</span>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Investment Strategy -->
+    <div class="col-12 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Investment Strategy</h4>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h6>Approach</h6>
+                        <p>{{ portfolio.investment_strategy.approach }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Rebalancing</h6>
+                        <p>{{ portfolio.investment_strategy.rebalancing_frequency }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Risk Management</h6>
+                        <ul class="list-unstyled">
+                            <li>Stop Loss: {{ portfolio.investment_strategy.risk_management.stop_loss }}</li>
+                            <li>Portfolio Stop: {{ portfolio.investment_strategy.risk_management.portfolio_stop_loss }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-3">
+                        <h6>Tax Optimization</h6>
+                        <ul class="list-unstyled">
+                            {% for scheme in portfolio.investment_strategy.tax_optimization.recommended_schemes %}
+                            <li>{{ scheme }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Portfolio Allocation Chart
+    const allocationCtx = document.getElementById('allocationChart').getContext('2d');
+    new Chart(allocationCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ portfolio.allocation.keys() | list | tojson }},
+            datasets: [{
+                data: {{ portfolio.allocation.values() | list | tojson }},
+                backgroundColor: [
+                    '#2ecc71',
+                    '#3498db',
+                    '#9b59b6',
+                    '#f1c40f',
+                    '#e74c3c'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'right'
+                }
+            }
+        }
+    });
+
+    // Auto-refresh market data every 5 minutes
+    setInterval(function() {
+        fetch('/api/market-data')
+            .then(response => response.json())
+            .then(data => {
+                // Update market data
+                Object.entries(data.market_data).forEach(([index, values]) => {
+                    const card = document.querySelector(`[data-index="${index}"]`);
+                    if (card) {
+                        card.querySelector('.current-price').textContent = `₹${values.current_price.toFixed(2)}`;
+                        card.querySelector('.change').textContent = 
+                            `${values.change >= 0 ? '+' : ''}${values.change.toFixed(2)} (${values.change_percent.toFixed(2)}%)`;
+                        card.querySelector('.volume').textContent = values.volume.toLocaleString();
+                    }
+                });
+            });
+    }, 300000);
+});
+</script>
+{% endblock %} 

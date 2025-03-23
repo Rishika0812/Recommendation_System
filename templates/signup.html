@@ -1,0 +1,217 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4">Create Account</h2>
+                
+                {% if error %}
+                <div class="alert alert-danger">{{ error }}</div>
+                {% endif %}
+                
+                <form method="POST" action="{{ url_for('signup') }}" id="signupForm">
+                    <!-- Step 1: Basic Information -->
+                    <div class="step" id="step1">
+                        <h4 class="mb-3">Basic Information</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Personal Information -->
+                    <div class="step" id="step2" style="display: none;">
+                        <h4 class="mb-3">Personal Information</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="age" class="form-label">Age</label>
+                                <input type="number" class="form-control" id="age" name="age" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="occupation" class="form-label">Occupation</label>
+                                <input type="text" class="form-control" id="occupation" name="occupation" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="marital_status" class="form-label">Marital Status</label>
+                                <select class="form-select" id="marital_status" name="marital_status" required>
+                                    <option value="">Select Status</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Divorced">Divorced</option>
+                                    <option value="Widowed">Widowed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="dependents" class="form-label">Number of Dependents</label>
+                                <input type="number" class="form-control" id="dependents" name="dependents" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Financial Information -->
+                    <div class="step" id="step3" style="display: none;">
+                        <h4 class="mb-3">Financial Information</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="monthly_income" class="form-label">Monthly Income</label>
+                                <input type="number" class="form-control" id="monthly_income" name="monthly_income" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="monthly_expenses" class="form-label">Monthly Expenses</label>
+                                <input type="number" class="form-control" id="monthly_expenses" name="monthly_expenses" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="existing_savings" class="form-label">Existing Savings</label>
+                                <input type="number" class="form-control" id="existing_savings" name="existing_savings" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="emergency_fund_amount" class="form-label">Emergency Fund Amount</label>
+                                <input type="number" class="form-control" id="emergency_fund_amount" name="emergency_fund_amount" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 4: Investment Preferences -->
+                    <div class="step" id="step4" style="display: none;">
+                        <h4 class="mb-3">Investment Preferences</h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="risk_tolerance" class="form-label">Risk Tolerance</label>
+                                <select class="form-select" id="risk_tolerance" name="risk_tolerance" required>
+                                    <option value="">Select Risk Tolerance</option>
+                                    <option value="Conservative">Conservative</option>
+                                    <option value="Moderate">Moderate</option>
+                                    <option value="Aggressive">Aggressive</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="investment_horizon" class="form-label">Investment Horizon</label>
+                                <select class="form-select" id="investment_horizon" name="investment_horizon" required>
+                                    <option value="">Select Horizon</option>
+                                    <option value="Short Term">Short Term</option>
+                                    <option value="Medium Term">Medium Term</option>
+                                    <option value="Long Term">Long Term</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="investment_knowledge" class="form-label">Investment Knowledge</label>
+                                <select class="form-select" id="investment_knowledge" name="investment_knowledge" required>
+                                    <option value="">Select Knowledge Level</option>
+                                    <option value="Basic">Basic</option>
+                                    <option value="Intermediate">Intermediate</option>
+                                    <option value="Advanced">Advanced</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="investment_frequency" class="form-label">Investment Frequency</label>
+                                <select class="form-select" id="investment_frequency" name="investment_frequency" required>
+                                    <option value="">Select Frequency</option>
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Quarterly">Quarterly</option>
+                                    <option value="Annually">Annually</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Buttons -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+                            <i class='bx bx-chevron-left'></i> Previous
+                        </button>
+                        <button type="button" class="btn btn-primary" id="nextBtn">
+                            Next <i class='bx bx-chevron-right'></i>
+                        </button>
+                        <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                            <i class='bx bx-check'></i> Submit
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-4">
+                    <p>Already have an account? <a href="{{ url_for('login') }}">Login</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('signupForm');
+    const steps = document.querySelectorAll('.step');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const submitBtn = document.getElementById('submitBtn');
+    let currentStep = 0;
+
+    function showStep(step) {
+        steps.forEach((s, index) => {
+            s.style.display = index === step ? 'block' : 'none';
+        });
+        
+        prevBtn.style.display = step === 0 ? 'none' : 'block';
+        nextBtn.style.display = step === steps.length - 1 ? 'none' : 'block';
+        submitBtn.style.display = step === steps.length - 1 ? 'block' : 'none';
+    }
+
+    function validateStep(step) {
+        const currentStepElement = steps[step];
+        const inputs = currentStepElement.querySelectorAll('input[required], select[required]');
+        let isValid = true;
+
+        inputs.forEach(input => {
+            if (!input.value.trim()) {
+                isValid = false;
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        });
+
+        return isValid;
+    }
+
+    nextBtn.addEventListener('click', () => {
+        if (validateStep(currentStep)) {
+            if (currentStep < steps.length - 1) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        }
+    });
+
+    prevBtn.addEventListener('click', () => {
+        if (currentStep > 0) {
+            currentStep--;
+            showStep(currentStep);
+        }
+    });
+
+    form.addEventListener('submit', function(e) {
+        if (!validateStep(currentStep)) {
+            e.preventDefault();
+            return;
+        }
+    });
+});
+</script>
+{% endblock %} 
